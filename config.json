@@ -16,9 +16,6 @@
                              // suppress_unchanged: If this is set to true, the target device will only send
                              // updates to the collector upon a change in data value
 
-                             // max_silent_interval: Maximum time in ms the target device may go without sending
-                             // a message to the collector. If this time expires with
-                             // suppress-unchanged set, the target device must send an update
                              // message regardless if the data values have changed.
 
                              // sample_frequncy: Time in ms between collection and transmission of the
@@ -28,7 +25,7 @@
                              // If sample-frequency is set to 0, then the network device
                              // must emit an update upon every datum change.
 
-                           "input":{"collector_list":[{"address":"10.92.232.121", "port":50051}]},
+                           "input":{"collector_list":[{"address":"10.92.456.121", "port":50051}]},
                              // address: IP address of collector endpoint
                              // port: Transport protocol port number for the collector destination.
 
