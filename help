@@ -1,0 +1,340 @@
+root@vm-balasank:/home/regress/jfit# jfit logs dg
+	usage: jfit logs [-h] group_name service
+	jfit logs: error: the following arguments are required: service
+root@vm-balasank:/home/regress/jfit# jfit status
+	usage: jfit status [-h] [-j] group_name
+jfit status: error: the following arguments are required: group_name
+root@vm-balasank:/home/regress/jfit# jfit status dg
+Name              Status
+-------------------------
+root@vm-balasank:/home/regress/jfit# jfit status dg
+Name              Status
+-------------------------
+root@vm-balasank:/home/regress/jfit# jfit status test_group
+^[`Name              Status
+-------------------------
+root@vm-balasank:/home/regress/jfit# jfit cli jfit influxdb
+
+docker-compose -p jfit  -f jfit_api_server.yaml -f jfit_mgd.yaml -f jfit_postgres.yaml -f jfit_influxdb.yaml -f jfit_grafana.yaml exec influxdb sh
+# ui^H^H^H
+sh: 1:: not found
+# influx
+Connected to http://localhost:8086 version 1.3.6
+InfluxDB shell version: 1.3.6
+> user^H
+ERR: error parsing query: found USER, expected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
+Warning: It is possible this error is due to not setting a database.
+Please set a database with the command "use <database>".
+> use dg_choc-mx240-k
+Using database dg_choc-mx240-k
+> show meea^H^H
+ERR: error parsing query: found meea, expected CONTINUOUS, DATABASES, DIAGNOSTICS, FIELD, GRANTS, MEASUREMENTS, QUERIES, RETENTION, SERIES, SHARD, SHARDS, STATS, SUBSCRIPTIONS, TAG, USERS at line 1, char 6
+> show measurements
+> exit
+# exit
+
+
+
+
+root@vm-balasank:/home/regress/jfit# jfit logs dg
+usage: jfit logs [-h] group_name service
+jfit logs: error: the following arguments are required: service
+root@vm-balasank:/home/regress/jfit# jfit logs dg telegraf
+docker-compose -p dg  -f jfit_telegraf.yaml -f jfit_kapacitor_training.yaml -f jfit_kapacitor.yaml ps -q dg-telegraf
+docker inspect --format="{{.LogPath}}" ef69a49e5a0278e01a2c056f12f76b417af39f05f7edda87df9c14e3dc73651b
+vi /var/lib/docker/containers/ef69a49e5a0278e01a2c056f12f76b417af39f05f7edda87df9c14e3dc73651b/ef69a49e5a0278e01a2c056f12f76b417af39f05f7edda87df9c14e3dc73651b-json.log
+root@vm-balasank:/home/regress/jfit# jfit cli dg
+usage: jfit cli [-h] group_name service
+jfit cli: error: the following arguments are required: service
+
+
+
+root@vm-balasank:/home/regress/jfit# jfit cli dg kapacitor
+docker-compose -p dg  -f jfit_telegraf.yaml -f jfit_kapacitor_training.yaml -f jfit_kapacitor.yaml exec dg-kapacitor sh
+# kapacor^H^H
+sh: 1: kapac: not found
+# kapacitor list tasks
+ID                                     Type      Status    Executing Databases and Retention Policies
+dg_choc-mx240-k_line-cards1_line-cards stream    enabled   true      ["dg_choc-mx240-k"."autogen" "Native"."autogen"]
+# ^[[A : not found
+# kapsa^H^H
+sh: 4: kap: not found
+# na^H^H^Hbas
+sh: 5:bas: not found
+# bash
+
+root@b55bc040d8ac:/# kapacitor show dg_choc-mx240-k_line-cards1_line-cards
+-replay                                 dg_choc-mx240-k_line-cards1_line-cards
+
+root@b55bc040d8ac:/# kapacitor show dg_choc-mx240-k_line-cards1_line-cards
+ID: dg_choc-mx240-k_line-cards1_line-cards
+Error:
+Template:
+Type: stream
+Status: enabled
+Executing: true
+Created: 24 May 18 11:11 UTC
+Modified: 24 May 18 11:11 UTC
+LastEnabled: 24 May 18 11:11 UTC
+Databases Retention Policies: ["dg_choc-mx240-k"."autogen" "Native"."autogen"]
+TICKscript:
+var jti_oc_database = 'dg_choc-mx240-k'
+
+var jti_native_database = 'dg_choc-mx240-k'
+
+var jti_iagent_database = 'dg_choc-mx240-k'
+
+var to_database = 'dg_choc-mx240-k'
+
+var var_memory = stream
+    |from()
+        .database(jti_oc_database)
+        .retentionPolicy('autogen')
+        .measurement('dg_choc-mx240-k./components/')
+        .where(lambda: "/components/component/properties/property/@name" == 'memory-dram-used')
+        .where(lambda: "/components/component/@name" =~ /^FPC[0-9]*$/)
+    |eval(lambda: int("/components/component/properties/property/state/value"), lambda: string("/components/component/@name"))
+        .as('memory', 'name')
+        .quiet()
+    |log()
+        .prefix('memory_field_stream')
+
+var var_temperature = stream
+    |from()
+        .database(jti_oc_database)
+        .retentionPolicy('autogen')
+        .measurement('dg_choc-mx240-k./components/')
+        .where(lambda: "/components/component/properties/property/@name" == 'temperature-intake')
+        .where(lambda: "/components/component/@name" =~ /^FPC[0-9]*$/)
+    |eval(lambda: int("/components/component/properties/property/state/value"), lambda: string("/components/component/@name"))
+        .as('temperature', 'name')
+        .quiet()
+    |log()
+        .prefix('temperature_field_stream')
+
+var var_temperature_hyphen_dt = var_temperature
+    |groupBy('/components/component/@name')
+    |eval(lambda: int("temperature"), lambda: string("name"))
+        .as('temperature', 'name')
+    @JfitDynamicThreshold()
+        .baseline_db('dg_choc-mx240-k')
+        .baseline_measurement('"line-cards1/line-cards/_ML_temperature-dt"')
+        .baseline_tags('name')
+        .field_name('temperature')
+        .influxdb('http://influxdb:8086')
+        .return_as('temperature-dt')
+    |log()
+        .prefix('temperature-dt_field_stream')
+
+var joined_fields = var_memory
+    |union(var_temperature, var_temperature_hyphen_dt)
+    |groupBy('/components/component/@name')
+    |flatten()
+        .tolerance(1s)
+    |default()
+        .field('memory', -2147483648)
+        .field('temperature', -2147483648)
+        .field('temperature-dt', 'NA')
+    |eval(lambda: int("memory"), lambda: string("name"), lambda: int("temperature"), lambda: string("temperature-dt"))
+        .as('memory', 'name', 'temperature', 'temperature-dt')
+        .tags('name')
+    |delete()
+        .tag('/components/component/@name')
+    |log()
+        .prefix('joined-fields')
+
+joined_fields
+    |influxDBOut()
+        .measurement('line-cards1/line-cards')
+        .database(to_database)
+        .flushInterval(10ms)
+
+DOT:
+digraph dg_choc-mx240-k_line-cards1_line-cards {
+graph [throughput="0.00 points/s"];
+
+stream0 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+stream0 -> from4 [processed="0"];
+stream0 -> from1 [processed="0"];
+
+from4 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+from4 -> eval5 [processed="0"];
+
+eval5 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+eval5 -> log6 [processed="0"];
+
+log6 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+log6 -> groupby7 [processed="0"];
+log6 -> union13 [processed="0"];
+
+groupby7 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+groupby7 -> eval8 [processed="0"];
+
+eval8 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+eval8 -> JfitDynamicThreshold9 [processed="0"];
+
+JfitDynamicThreshold9 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+JfitDynamicThreshold9 -> log10 [processed="0"];
+
+log10 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+log10 -> union13 [processed="0"];
+
+from1 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+from1 -> eval2 [processed="0"];
+
+eval2 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+eval2 -> log3 [processed="0"];
+
+log3 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+log3 -> union13 [processed="0"];
+
+union13 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+union13 -> groupby14 [processed="0"];
+
+groupby14 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+groupby14 -> flatten15 [processed="0"];
+
+flatten15 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+flatten15 -> default16 [processed="0"];
+
+default16 [avg_exec_time_ns="0s" errors="0" fields_defaulted="0" tags_defaulted="0" working_cardinality="0" ];
+default16 -> eval17 [processed="0"];
+
+eval17 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+eval17 -> delete18 [processed="0"];
+
+delete18 [avg_exec_time_ns="0s" errors="0" fields_deleted="0" tags_deleted="0" working_cardinality="0" ];
+delete18 -> log19 [processed="0"];
+
+log19 [avg_exec_time_ns="0s" errors="0" working_cardinality="0" ];
+log19 -> influxdb_out20 [processed="0"];
+
+influxdb_out20 [avg_exec_time_ns="0s" errors="0" points_written="0" working_cardinality="0" write_errors="0" ];
+}
+root@b55bc040d8ac:/# exit
+exit
+# exit
+root@vm-balasank:/home/regress/jfit# jfit restart dg
+docker-compose -p dg  -f jfit_telegraf.yaml -f jfit_kapacitor_training.yaml -f jfit_kapacitor.yaml restart
+Restarting dg_dg-configure-kapacitor-tasks_1          ... done
+Restarting dg_dg-configure-kapacitor-training-tasks_1 ... done
+Restarting dg_dg-kapacitor_1                          ... done
+Restarting dg_dg-telegraf_1                           ... done
+Restarting dg_dg-kapacitor-training_1                 ... done
+
+Success!
+root@vm-balasank:/home/regress/jfit# docker logs -f dg_dg-telegraf_1
+2018/05/24 11:11:32 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:11:32Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:11:32Z I! Loaded outputs: influxdb
+2018-05-24T11:11:32Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:11:32Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:11:32Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+2018/05/24 11:18:19 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:18:19Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:18:19Z I! Loaded outputs: influxdb
+2018-05-24T11:18:19Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:18:19Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:18:19Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+ ^C
+root@vm-balasank:/home/regress/jfit# jfit restart dg
+docker-compose -p dg  -f jfit_telegraf.yaml -f jfit_kapacitor_training.yaml -f jfit_kapacitor.yaml restart
+Restarting dg_dg-configure-kapacitor-tasks_1          ... done
+Restarting dg_dg-configure-kapacitor-training-tasks_1 ... done
+Restarting dg_dg-kapacitor_1                          ... done
+Restarting dg_dg-telegraf_1                           ... done
+Restarting dg_dg-kapacitor-training_1                 ... done
+
+Success!
+root@vm-balasank:/home/regress/jfit# docker logs -f dg_dg-telegraf_1
+2018/05/24 11:11:32 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:11:32Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:11:32Z I! Loaded outputs: influxdb
+2018-05-24T11:11:32Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:11:32Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:11:32Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+2018/05/24 11:18:19 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:18:19Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:18:19Z I! Loaded outputs: influxdb
+2018-05-24T11:18:19Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:18:19Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:18:19Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+2018/05/24 11:20:38 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:20:38Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:20:38Z I! Loaded outputs: influxdb
+2018-05-24T11:20:38Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:20:38Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:20:38Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+^C
+root@vm-balasank:/home/regress/jfit# docker logs -f dg_dg-telegraf_1
+2018/05/24 11:11:32 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:11:32Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:11:32Z I! Loaded outputs: influxdb
+2018-05-24T11:11:32Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:11:32Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:11:32Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+2018/05/24 11:18:19 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:18:19Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:18:19Z I! Loaded outputs: influxdb
+2018-05-24T11:18:19Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:18:19Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:18:19Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+2018/05/24 11:20:38 I! Using config file: /etc/telegraf/telegraf.conf
+2018-05-24T11:20:38Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
+2018-05-24T11:20:38Z I! Loaded outputs: influxdb
+2018-05-24T11:20:38Z I! Loaded inputs: inputs.jti_openconfig_telemetry
+2018-05-24T11:20:38Z I! Tags enabled: host=ef69a49e5a02
+2018-05-24T11:20:38Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
+^C
+root@vm-balasank:/home/regress/jfit# jfit cli influxdb
+usage: jfit cli [-h] group_name service
+jfit cli: error: the following arguments are required: service
+root@vm-balasank:/home/regress/jfit# jfit cli jfit influxdb
+docker-compose -p jfit  -f jfit_api_server.yaml -f jfit_mgd.yaml -f jfit_postgres.yaml -f jfit_influxdb.yaml -f jfit_grafana.yaml exec influxdb sh
+# influx
+Connected to http://localhost:8086 version 1.3.6
+InfluxDB shell version: 1.3.6
+> b^H
+ERR: error parsing query: found b, expected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
+Warning: It is possible this error is due to not setting a database.
+Please set a database with the command "use <database>".
+> user ^H^H
+ERR: error parsing query: found USER, expected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
+Warning: It is possible this error is due to not setting a database.
+Please set a database with the command "use <database>".
+> use dg2_tek^H
+ERR: Database dg2_te doesn't exist. Run SHOW DATABASES for a list of existing databases.
+> ^[[A
+ERR: error parsing query: found xpected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
+Warning: It is possible this error is due to not setting a database.
+Please set a database with the command "use <database>".
+> use dg2_teka
+ERR: Database dg2_teka doesn't exist. Run SHOW DATABASES for a list of existing databases.
+> use dg2_teakwood
+Using database dg2_teakwood
+> show measurements
+name: measurements
+name
+----
+dg2_teakwood./components/
+line-cards1/line-cards
+line-cards1/line-cards/_ML_temperature-dt
+> ^[[A
+ERR: error parsing query: found xpected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
+> show measurements
+name: measurements
+name
+----
+dg2_teakwood./components/
+line-cards1/line-cards
+line-cards1/line-cards/_ML_temperature-dt
+>
+
+
+
+
+
+
+docker run -p 8082:8080 swaggerapi/swagger-editor
+
+
