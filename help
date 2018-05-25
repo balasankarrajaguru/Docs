@@ -4,6 +4,8 @@ root@vm-balasank:/home/regress/jfit# jfit logs dg
 root@vm-balasank:/home/regress/jfit# jfit status
 	usage: jfit status [-h] [-j] group_name
 jfit status: error: the following arguments are required: group_name
+
+===========================================================
 root@vm-balasank:/home/regress/jfit# jfit status dg
 Name              Status
 -------------------------
@@ -13,22 +15,21 @@ Name              Status
 root@vm-balasank:/home/regress/jfit# jfit status test_group
 ^[`Name              Status
 -------------------------
-root@vm-balasank:/home/regress/jfit# jfit cli jfit influxdb
 
+
+INFLUXDB
+
+=========================
+root@vm-balasank:/home/regress/jfit# jfit cli jfit influxdb
 docker-compose -p jfit  -f jfit_api_server.yaml -f jfit_mgd.yaml -f jfit_postgres.yaml -f jfit_influxdb.yaml -f jfit_grafana.yaml exec influxdb sh
 # ui^H^H^H
 sh: 1:: not found
 # influx
 Connected to http://localhost:8086 version 1.3.6
 InfluxDB shell version: 1.3.6
-> user^H
-ERR: error parsing query: found USER, expected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
-Warning: It is possible this error is due to not setting a database.
-Please set a database with the command "use <database>".
+
 > use dg_choc-mx240-k
 Using database dg_choc-mx240-k
-> show meea^H^H
-ERR: error parsing query: found meea, expected CONTINUOUS, DATABASES, DIAGNOSTICS, FIELD, GRANTS, MEASUREMENTS, QUERIES, RETENTION, SERIES, SHARD, SHARDS, STATS, SUBSCRIPTIONS, TAG, USERS at line 1, char 6
 > show measurements
 > exit
 # exit
@@ -49,18 +50,13 @@ jfit cli: error: the following arguments are required: service
 
 
 
+KAPACITOR
+=========
 root@vm-balasank:/home/regress/jfit# jfit cli dg kapacitor
 docker-compose -p dg  -f jfit_telegraf.yaml -f jfit_kapacitor_training.yaml -f jfit_kapacitor.yaml exec dg-kapacitor sh
-# kapacor^H^H
-sh: 1: kapac: not found
 # kapacitor list tasks
 ID                                     Type      Status    Executing Databases and Retention Policies
 dg_choc-mx240-k_line-cards1_line-cards stream    enabled   true      ["dg_choc-mx240-k"."autogen" "Native"."autogen"]
-# ^[[A : not found
-# kapsa^H^H
-sh: 4: kap: not found
-# na^H^H^Hbas
-sh: 5:bas: not found
 # bash
 
 root@b55bc040d8ac:/# kapacitor show dg_choc-mx240-k_line-cards1_line-cards
@@ -214,6 +210,10 @@ influxdb_out20 [avg_exec_time_ns="0s" errors="0" points_written="0" working_card
 root@b55bc040d8ac:/# exit
 exit
 # exit
+
+
+Restarting a device group
+==================================
 root@vm-balasank:/home/regress/jfit# jfit restart dg
 docker-compose -p dg  -f jfit_telegraf.yaml -f jfit_kapacitor_training.yaml -f jfit_kapacitor.yaml restart
 Restarting dg_dg-configure-kapacitor-tasks_1          ... done
@@ -223,6 +223,10 @@ Restarting dg_dg-telegraf_1                           ... done
 Restarting dg_dg-kapacitor-training_1                 ... done
 
 Success!
+
+
+Device-Groups logs
+==================
 root@vm-balasank:/home/regress/jfit# docker logs -f dg_dg-telegraf_1
 2018/05/24 11:11:32 I! Using config file: /etc/telegraf/telegraf.conf
 2018-05-24T11:11:32Z I! Starting Telegraf v1.0.0-beta1-1258-g1be9aa12
@@ -286,6 +290,11 @@ root@vm-balasank:/home/regress/jfit# docker logs -f dg_dg-telegraf_1
 2018-05-24T11:20:38Z I! Tags enabled: host=ef69a49e5a02
 2018-05-24T11:20:38Z I! Agent Config: Interval:10s, Quiet:false, Hostname:"ef69a49e5a02", Flush Interval:10s
 ^C
+
+
+
+INFLUXDB
+=========
 root@vm-balasank:/home/regress/jfit# jfit cli influxdb
 usage: jfit cli [-h] group_name service
 jfit cli: error: the following arguments are required: service
@@ -294,23 +303,6 @@ docker-compose -p jfit  -f jfit_api_server.yaml -f jfit_mgd.yaml -f jfit_postgre
 # influx
 Connected to http://localhost:8086 version 1.3.6
 InfluxDB shell version: 1.3.6
-> b^H
-ERR: error parsing query: found b, expected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
-Warning: It is possible this error is due to not setting a database.
-Please set a database with the command "use <database>".
-> user ^H^H
-ERR: error parsing query: found USER, expected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
-Warning: It is possible this error is due to not setting a database.
-Please set a database with the command "use <database>".
-> use dg2_tek^H
-ERR: Database dg2_te doesn't exist. Run SHOW DATABASES for a list of existing databases.
-> ^[[A
-ERR: error parsing query: found xpected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
-Warning: It is possible this error is due to not setting a database.
-Please set a database with the command "use <database>".
-> use dg2_teka
-ERR: Database dg2_teka doesn't exist. Run SHOW DATABASES for a list of existing databases.
-> use dg2_teakwood
 Using database dg2_teakwood
 > show measurements
 name: measurements
@@ -319,8 +311,6 @@ name
 dg2_teakwood./components/
 line-cards1/line-cards
 line-cards1/line-cards/_ML_temperature-dt
-> ^[[A
-ERR: error parsing query: found xpected SELECT, DELETE, SHOW, CREATE, DROP, GRANT, REVOKE, ALTER, SET, KILL at line 1, char 1
 > show measurements
 name: measurements
 name
@@ -334,7 +324,40 @@ line-cards1/line-cards/_ML_temperature-dt
 
 
 
-
+Swagger 
+========
 docker run -p 8082:8080 swaggerapi/swagger-editor
 
+	- Open The browser
+	- http://10.209.1.98:8082/
+	- Copy the JSON which codes the REST API in Swagger Editor
+	- You will see a left and right window explaining the Rest API and it Parameters
+	- you can also edit and execute the same in the editor
+
+
+
+Router Configs
+=============
+set interfaces lo0.0 family inet address 127.0.0.1/32
+set system services extension-service request-response grpc clear-text address 0.0.0.0
+set system services extension-service request-response grpc clear-text port 50051
+set system services extension-service request-response grpc max-connections 10
+set system services extension-service request-response grpc skip-authentication
+set system services extension-service notification allow-clients address 0.0.0.0/0
+set system services extension-service traceoptions file jsd
+set system services extension-service traceoptions flag all
+set system services netconf ssh
+
+
+
+INFLUX DB ACCESS 
+===============
+http://contrail-ubm-vijaygadde02.ccp.juniper.net:8083/?#
+
+
+RUNNING JFIT
+========
+	- Add interfaces are up in the Playbook instance
+	- Define Triggers
+	
 
