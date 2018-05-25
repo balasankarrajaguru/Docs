@@ -361,3 +361,33 @@ RUNNING JFIT
 	- Define Triggers
 	
 
+
+
+
+Deleting Docker Volume
+=======================
+
+root@vm-balasank:/home/regress/test-jfit/jfit# docker volumes ls
+docker: 'volumes' is not a docker command.
+See 'docker --help'
+root@vm-balasank:/home/regress/test-jfit/jfit# docker volume ls
+DRIVER              VOLUME NAME
+local               0a0c345b089b7db72717f0038a2230ea81ef53adfdcce10bfcdbee0dd71e7e60
+local               0b10533baf8e362ca3fef70e2746f0d0c54934646b46988fe34d4570b78d2496
+local               0e5b7dbe9c7253ecd1e75e51e7f4a71cabf09decd78dab02721c7aa78c4aab12
+local               10d7a69c6bf0b4acb8e4c1f7452541222214dc0a5b7939dc58e9df0588e0d11b
+local               2ac03f69a47ab79723cb93b5835f418c93cfbf13c8403a7b0278f674b579bcbd
+local               3d13ed7fdd8c4d06e75f33fd39c0559d2f660c3159da1b1dd6215bf43b888ed6
+local               4da899b46c42cd44a1818423839d6baf95a68067575d8d32abd7dd8177b80876
+local               4ee3a96ab9f2d9454fbe8238a6e35987eae52d92a11f70b78821dc47f6828d62
+local               4f31564d401f49735d12bbe3baa7cfb7af2eb8b3d46f97a2998ec67926154279
+local               82a6bb9522a24c65bab0f22ca0396117e31825dd9361005a6f2379144dc5a083
+local               a3028358001cbd14605b48d66daa256a6aea027ab22e48f29613a1eb6b2efef0
+local               b63288b7f984214e2eaa02d1ee164e5834cbbb07ec5ab39c1b9622ded587c4fc
+local               d74b76f6ec925ca4a5385a29ec16c99db2c233e399685345f2f37fa65499cbd5
+local               e400ccdf66a8ae91c955ffaf9192809155634789f9f5a54454c679c0d0ac1b21
+root@vm-balasank:/home/regress/test-jfit/jfit# docker volume rm `docker volume ls -q`
+0a0c345b089b7db72717f0038a2230ea81ef53adfdcce10bfcdbee0dd71e7e60
+0b10533baf8e362ca3fef70e2746f0d0c54934646b46988fe34d4570b78d2496
+0e5b7dbe9c7253ecd1e75e51e7f4a71cabf09decd78dab02721c7aa78c4aab12
+
