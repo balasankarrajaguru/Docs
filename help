@@ -391,3 +391,27 @@ root@vm-balasank:/home/regress/test-jfit/jfit# docker volume rm `docker volume l
 0b10533baf8e362ca3fef70e2746f0d0c54934646b46988fe34d4570b78d2496
 0e5b7dbe9c7253ecd1e75e51e7f4a71cabf09decd78dab02721c7aa78c4aab12
 
+
+
+Testing MGD
+===========
+1. Modify Docker file
+2. Build using ./sb.py build -s jfit-mgd
+3. Change version.json file
+4. jfit init
+
+
+
+1. Jfit install will load the docker images
+	- docker load
+	- Compose files will be generated
+	- Version.json file will be generated in dist folder. 
+
+2. jfit init
+	- Will use the compose files based on the versions in the version.json file 
+	- run the images as containers
+
+3. In case if the user has not done any commit, then the image version will be same. 
+4. If he has committed then he will see the new version which he needs to update in the version.json 
+   and do "jfit destroy" and "jfit init"
+
