@@ -1,0 +1,22 @@
+
+Master : test.get
+Branch_name : my_08_06_18
+
+1. Cloning a branch(MASTER) from git
+   git clone git@github.com:balasankar-57/Test.git
+
+2. Creating a new branch for bugfix/developement
+   git checkout -b my_08_06_18
+
+3. Setting the branch 
+   git checkout my_08_06_18
+
+4. Make changes
+5. git add/rm
+6. git commit
+7. Push the changes to the new created branch
+   git push origin my_08_06_18
+
+8. Merge with master
+   a. Pull paster or set using "git checkout master"
+   b. get merge my_08_06_18
