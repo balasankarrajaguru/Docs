@@ -1,0 +1,21 @@
+INGEST --> DATA (Sensor Data --> JTI MON) (Subscribe to the device)
+TRIGGER ---> Will generate the TICK script, Kapactior does the evualauation and then the result wil be written in Influxdb
+
+1. API_SERVER -> JFIT CORE generates config for JTIMON or Kapacitor, Restart the container.
+
+2. iAgent
+   ======
+   YAML file what show command to be executed
+   How to parse the data of the show command
+	- XPATH of the data for XMLized 
+	- incase of text output </output>, use regex
+        It is called screenscrapping
+   IAgent Docker will run/schedule the show command
+	  Get the output
+	  Parse the output
+	  Write to Influx DB
+
+   YAML file has the table name
+   Table name has to used as sensor
+
+3. VXCODE
