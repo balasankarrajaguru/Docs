@@ -415,3 +415,17 @@ Testing MGD
 4. If he has committed then he will see the new version which he needs to update in the version.json 
    and do "jfit destroy" and "jfit init"
 
+
+
+API SERVER 
+============
+PYTHONPATH=~/code/iceberg/jfit-api-server JFIT_ROOT=/Users/ishaank/code/iceberg/jfit-build/dist INFLUXDB_HOST=localhost INFLUXDB_PORT=8086 python -m api_server
+
+
+PYTHONPATH=~/jfit-build/src/jfit-api-server JFIT_ROOT=~/jfit-build/dist INFLUXDB_HOST=localhost INFLUXDB_PORT=8086 python3 -m api_server
+
+jfit stop -s api_server
+
+1. change port 
+2. in Build, remove all copy stuffs
+3. Gui not needed
