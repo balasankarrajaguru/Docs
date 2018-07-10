@@ -1,0 +1,30 @@
+
+Updating a feature branch
+
+First we'll update your local master branch. Go to your local project and check out the branch you want to merge into (your local master branch)
+
+$ git checkout master
+
+Fetch the remote, bringing the branches and their commits from the remote repository. You can use the -p, --prune option to delete any remote-tracking references that no longer exist in the remote. Commits to master will be stored in a local branch, remotes/origin/master
+
+$ git fetch -p origin
+
+Merge the changes from origin/master into your local master branch. This brings your master branch in sync with the remote repository, without losing your local changes. If your local branch didn't have any unique commits, Git will instead perform a "fast-forward".
+
+$ git merge origin/master
+
+Check out the branch you want to merge into
+
+$ git checkout <feature-branch>
+
+Merge your (now updated) master branch into your feature branch to update it with the latest changes from your team.
+
+$ git merge master
+
+Depending on your git configuration this may open vim. Enter a commit message, save, and quit vim e.g. press "a" to enter insert mode and append text following current cursor position, press Esc key to enter command mode, press :wq to write the file to disk and quit.
+
+This only updates your local feature branch. To update it on GitHub, push your changes.
+
+$ git push origin <feature-branch>
+
+Reference : https://gist.github.com/santisbon/a1a60db1fb8eecd1beeacd986ae5d3ca
