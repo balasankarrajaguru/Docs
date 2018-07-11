@@ -429,3 +429,8 @@ jfit stop -s api_server
 1. change port 
 2. in Build, remove all copy stuffs
 3. Gui not needed
+
+
+API SERVER TESTING 
+==============
+newman run FULL_TESTING.postman_collection.json -e Testing_environment.postman_environment.json
