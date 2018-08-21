@@ -28,3 +28,7 @@ This only updates your local feature branch. To update it on GitHub, push your c
 $ git push origin <feature-branch>
 
 Reference : https://gist.github.com/santisbon/a1a60db1fb8eecd1beeacd986ae5d3ca
+
+
+
+https://stackoverflow.com/questions/10298291/cannot-push-to-github-keeps-saying-need-merge
